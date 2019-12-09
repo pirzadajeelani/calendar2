@@ -26,5 +26,6 @@ namespace MVCEventCalendar
         }
     
         public virtual DbSet<Event> Events { get; set; }
+        public virtual DbSet<OdsEvent> OdsEvents { get; set; }
     }
 }

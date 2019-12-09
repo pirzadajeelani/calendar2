@@ -13,14 +13,16 @@ namespace MVCEventCalendar.Controllers
         {
             return View();
         }
-
-        public JsonResult GetEvents()
+        public JsonResult GetEvents()//JsonResult
         {
+
             using (MyDatabaseEntities dc = new MyDatabaseEntities())
             {
                 var events = dc.Events.ToList();
                 return new JsonResult { Data = events, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+
             }
+
         }
 
         [HttpPost]
@@ -56,6 +58,42 @@ namespace MVCEventCalendar.Controllers
         }
 
         [HttpPost]
+        public JsonResult SaveOdsEvent(OdsEvent e)
+        {
+            var status = false;
+            using (MyDatabaseEntities dc = new MyDatabaseEntities())
+            {
+                if (e.EventID > 0)
+                {
+                    //Update the event
+                    var v = dc.Events.Where(a => a.EventID == e.EventID).FirstOrDefault();
+                    if (v != null)
+                    { 
+                        v.Start = e.Start;
+                        v.End = e.End;
+                        v.Description = e.Description;
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        dc.OdsEvents.Add(e);
+                    }
+                    catch (Exception ll) {
+                        string l = "";
+                    }
+                }
+
+                dc.SaveChanges();
+                status = true;
+
+            }
+            return new JsonResult { Data = new { status = status } };
+        }
+
+
+        [HttpPost]
         public JsonResult DeleteEvent(int eventID)
         {
             var status = false;
@@ -69,7 +107,7 @@ namespace MVCEventCalendar.Controllers
                     status = true;
                 }
             }
-            return new JsonResult { Data = new { status = status} };
+            return new JsonResult { Data = new { status = status } };
         }
     }
 }
